@@ -1,0 +1,42 @@
+#include <SoftwareSerial.h>
+#include <Stepper.h>
+
+#define pinRx_BT 2 //10
+#define pinTx_BT 3 //11
+String readvoice;
+SoftwareSerial serialBT(pinRx_BT,pinTx_BT);
+
+const int stepsPerRevolution = 60;
+Stepper myStepper = Stepper(stepsPerRevolution, 8, 10, 9, 11);
+
+void setup() {
+ serialBT.begin(9600);
+ Serial.begin(9600);
+}
+//-----------------------------------------------------------------------//  
+void loop() {
+  while (serialBT.available()){
+    char c = serialBT.read();
+    readvoice += c;
+  }
+  
+  Serial.println(readvoice);
+  if (readvoice.length() == 2 || readvoice.length() == 4) {
+    Serial.println(readvoice);
+    if(readvoice == "up"){
+      myStepper.setSpeed(200);
+      myStepper.step(stepsPerRevolution);
+    } 
+    else if(readvoice == "down"){
+      myStepper.setSpeed(200);
+      myStepper.step(-stepsPerRevolution);
+    }
+    else if(readvoice != "up" || readvoice != "down"){
+      readvoice="";
+    }
+  } 
+  else if(readvoice.length() > 4){
+    readvoice="";
+  }
+  }
+
